@@ -17,6 +17,13 @@
 // NTP setting
 #define TIME_NTP_SERVER "pool.ntp.org" // NTP server URL
 #define TIME_OFFSET 2 * 3600  // Offset to UTC time in seconds 
+#define TIME_SYNC_DELAY 3600 // Delay before NTP resync
+
+// Custom time and date format
+#define get_time() (String(hour()) + ":" + String(minute()))
+#define get_date() (String(day()) + " " + monthStr(month()) + " " + String(year()))
 
 #endif
+
+
 

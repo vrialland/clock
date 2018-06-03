@@ -3,6 +3,7 @@
 #include <WiFiUdp.h>
 
 #include "SSD1306Wire.h"
+#include "TimeLib.h"
 
 #include "config.h"
 
@@ -10,7 +11,7 @@
 SSD1306Wire display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
 // NTP
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, TIME_NTP_SERVER, TIME_OFFSET, 3600);
+NTPClient timeClient(ntpUDP, TIME_NTP_SERVER, TIME_OFFSET, TIME_SYNC_DELAY);
 
 
 void setup() {
@@ -47,13 +48,15 @@ void setup() {
 
 void loop() {
   timeClient.update();
+  setTime(timeClient.getEpochTime());
   display.clear();
-  String time = timeClient.getFormattedTime();
   display.setFont(ArialMT_Plain_24);
-  display.setTextAlignment(TEXT_ALIGN_CENTER_BOTH);
-  display.drawStringMaxWidth(SCREEN_HALF_X, SCREEN_HALF_Y, SCREEN_WIDTH, time);
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+  display.drawStringMaxWidth(SCREEN_HALF_X, 10, SCREEN_WIDTH, get_time());
+  display.setFont(ArialMT_Plain_16);
+  display.drawStringMaxWidth(SCREEN_HALF_X, 40, SCREEN_WIDTH, get_date());
   display.display();
-  Serial.println(time);
+  Serial.println(get_time());
   delay(1000);
 }
 
