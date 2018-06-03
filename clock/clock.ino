@@ -7,10 +7,10 @@
 #include "config.h"
 
 // Display
-SSD1306Wire display(OLED_ADDRESS, OLED_SDA, OLED_SCL);
+SSD1306Wire display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
 // NTP
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, NTP_SERVER, 0, 3600);
+NTPClient timeClient(ntpUDP, TIME_NTP_SERVER, TIME_OFFSET, 3600);
 
 
 void setup() {
@@ -24,8 +24,8 @@ void setup() {
   Serial.print("Connecting to wifi: ");
   Serial.println(WIFI_SSID);
   display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.drawStringMaxWidth(OLED_PADDING, 0, OLED_WIDTH, "Connecting to wifi: ");
-  display.drawStringMaxWidth(OLED_PADDING, 14, OLED_WIDTH, WIFI_SSID);
+  display.drawStringMaxWidth(0, 0, SCREEN_WIDTH, "Connecting to wifi: ");
+  display.drawStringMaxWidth(0, 14, SCREEN_WIDTH, WIFI_SSID);
   display.display();
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
@@ -37,8 +37,8 @@ void setup() {
   Serial.println(WiFi.localIP());
   Serial.println();
   display.clear();
-  display.drawStringMaxWidth(OLED_PADDING, 0, OLED_WIDTH, "Connected, IP address: ");
-  display.drawStringMaxWidth(OLED_PADDING, 14, OLED_WIDTH, String(WiFi.localIP()));
+  display.drawStringMaxWidth(0, 0, SCREEN_WIDTH, "Connected, IP address: ");
+  display.drawStringMaxWidth(0, 14, SCREEN_WIDTH, String(WiFi.localIP()));
   display.display();
   // Init NTP client
   timeClient.begin();
@@ -49,7 +49,9 @@ void loop() {
   timeClient.update();
   display.clear();
   String time = timeClient.getFormattedTime();
-  display.drawStringMaxWidth(OLED_PADDING, 0, OLED_WIDTH, time);
+  display.setFont(ArialMT_Plain_24);
+  display.setTextAlignment(TEXT_ALIGN_CENTER_BOTH);
+  display.drawStringMaxWidth(SCREEN_HALF_X, SCREEN_HALF_Y, SCREEN_WIDTH, time);
   display.display();
   Serial.println(time);
   delay(1000);
