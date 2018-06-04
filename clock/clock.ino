@@ -11,9 +11,9 @@
 #include <SSD1306Wire.h>
 #include <TimeLib.h>
 
-#include "config.h"
-#include "fonts.h"
-#include "images.h"
+#include "config.hpp"
+#include "fonts.hpp"
+#include "images.hpp"
 
 // Display
 SSD1306Wire display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
