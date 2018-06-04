@@ -1,12 +1,19 @@
+// WifiManager
 #include <ESP8266WiFi.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>
+
+// NTP Client
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-#include "SSD1306Wire.h"
-#include "TimeLib.h"
+#include <SSD1306Wire.h>
+#include <TimeLib.h>
 
 #include "config.h"
 #include "fonts.h"
+#include "images.h"
 
 // Display
 SSD1306Wire display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
@@ -49,46 +56,49 @@ String getDate(long epochTime) {
 
 
 void setup() {
+  Serial.begin(115200);
+
   // Init display
   display.init();
+  
+  // Configure wifi connection
+  WiFiManager wifiManager;
+  // Display setup infos on screen (wifi logo + SSID)
+  String ssid = "Clock";
+  display.drawXbm((int)(SCREEN_HALF_X - WIFI_LOGO_WIDTH / 2), 2, WIFI_LOGO_WIDTH, WIFI_LOGO_HEIGHT, WIFI_LOGO_BITS);
   display.setFont(Roboto_12);
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+  display.drawStringMaxWidth(SCREEN_HALF_X, 44, SCREEN_WIDTH, "SSID: \"" + ssid + "\"");
+  display.display();
+  
+  wifiManager.autoConnect(ssid.c_str());
 
-  // Connect to configured wifi
-  Serial.begin(115200);
-  Serial.println();
-  Serial.print("Connecting to wifi: ");
-  Serial.println(WIFI_SSID);
-  display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.drawStringMaxWidth(0, 0, SCREEN_WIDTH, "Connecting to wifi: ");
-  display.drawStringMaxWidth(0, 14, SCREEN_WIDTH, WIFI_SSID);
-  display.display();
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println();
-  Serial.print("Connected, IP address: ");
-  Serial.println(WiFi.localIP());
-  Serial.println();
+  // Clear screen
   display.clear();
-  display.drawStringMaxWidth(0, 0, SCREEN_WIDTH, "Connected, IP address: ");
-  display.drawStringMaxWidth(0, 14, SCREEN_WIDTH, String(WiFi.localIP()));
   display.display();
+  
   // Init NTP client
   timeClient.begin();
 }
 
 
 void loop() {
+  // Update time if needed
   timeClient.update();
+
+  // Clear screen
   display.clear();
+
+  // Display time and date
   display.setFont(Roboto_36);
   display.setTextAlignment(TEXT_ALIGN_CENTER_BOTH);
   display.drawStringMaxWidth(SCREEN_HALF_X, 23, SCREEN_WIDTH, getTime(timeClient.getEpochTime()));
   display.setFont(Roboto_12);
   display.drawStringMaxWidth(SCREEN_HALF_X, 53, SCREEN_WIDTH, getDate(timeClient.getEpochTime()));
+
+  // Update screen
   display.display();
+
   delay(1000);
 }
 

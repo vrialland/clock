@@ -10,10 +10,6 @@
 #define SCREEN_HALF_X SCREEN_WIDTH / 2
 #define SCREEN_HALF_Y SCREEN_HEIGHT / 2
 
-// Wifi related
-#define WIFI_SSID "SSID"
-#define WIFI_PASSWORD "password"
-
 // NTP setting
 #define TIME_NTP_SERVER "pool.ntp.org" // NTP server URL
 #define TIME_OFFSET 2 * 3600  // Offset to UTC time in seconds 
