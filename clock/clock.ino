@@ -6,6 +6,7 @@
 #include "TimeLib.h"
 
 #include "config.h"
+#include "fonts.h"
 
 // Display
 SSD1306Wire display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
@@ -14,11 +15,44 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, TIME_NTP_SERVER, TIME_OFFSET, TIME_SYNC_DELAY);
 
 
+String getTime(long epochTime) {
+  int hours = hour(epochTime);
+  int minutes = minute(epochTime);
+  String out = "";
+  out += hours < 10 ? "0" + String(hours) : String(hours);
+  out += ":";
+  out += minutes < 10 ? "0" + String(minutes) : String(minutes);
+  return out;
+}
+
+
+String getDate(long epochTime) {
+  const String months[] = {
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre"
+  };
+  String dayStr = String(day(epochTime));
+  String monthStr = months[month(epochTime) - 1];
+  String yearStr = String(year(epochTime));
+  return dayStr + " " + monthStr + " " + yearStr;
+}
+
+
 void setup() {
   // Init display
   display.init();
-  display.setFont(ArialMT_Plain_10);
-  
+  display.setFont(Roboto_12);
+
   // Connect to configured wifi
   Serial.begin(115200);
   Serial.println();
@@ -48,15 +82,13 @@ void setup() {
 
 void loop() {
   timeClient.update();
-  setTime(timeClient.getEpochTime());
   display.clear();
-  display.setFont(ArialMT_Plain_24);
-  display.setTextAlignment(TEXT_ALIGN_CENTER);
-  display.drawStringMaxWidth(SCREEN_HALF_X, 10, SCREEN_WIDTH, get_time());
-  display.setFont(ArialMT_Plain_16);
-  display.drawStringMaxWidth(SCREEN_HALF_X, 40, SCREEN_WIDTH, get_date());
+  display.setFont(Roboto_36);
+  display.setTextAlignment(TEXT_ALIGN_CENTER_BOTH);
+  display.drawStringMaxWidth(SCREEN_HALF_X, 23, SCREEN_WIDTH, getTime(timeClient.getEpochTime()));
+  display.setFont(Roboto_12);
+  display.drawStringMaxWidth(SCREEN_HALF_X, 53, SCREEN_WIDTH, getDate(timeClient.getEpochTime()));
   display.display();
-  Serial.println(get_time());
   delay(1000);
 }
 
