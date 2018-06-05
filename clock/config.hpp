@@ -1,5 +1,5 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
 // Wifi
 #define SSID "Clock"
@@ -19,6 +19,3 @@
 #define TIME_SYNC_DELAY 3600 // Delay before NTP resync
 
 #endif
-
-
-

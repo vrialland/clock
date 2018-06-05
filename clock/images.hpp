@@ -1,3 +1,6 @@
+#ifdef IMAGES_HPP
+#define IMAGES_HPP
+
 #define WIFI_LOGO_WIDTH 60
 #define WIFI_LOGO_HEIGHT 36
 const uint8_t WIFI_LOGO_BITS[] PROGMEM = {
@@ -27,3 +30,4 @@ const uint8_t WIFI_LOGO_BITS[] PROGMEM = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
+#endif
