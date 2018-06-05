@@ -1,6 +1,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+// Wifi
+#define SSID "Clock"
+
 // Screen
 #define SCREEN_ADDRESS 0x3c
 #define SCREEN_SDA D3

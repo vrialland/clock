@@ -3,6 +3,7 @@
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
+#include <ESP8266WiFi.h>
 
 // NTP Client
 #include <NTPClient.h>
@@ -55,6 +56,15 @@ String getDate(long epochTime) {
 }
 
 
+void showWifiSetup(OLEDDisplay *display, const char* ssid) {
+    display->drawXbm((int)(SCREEN_HALF_X - WIFI_LOGO_WIDTH / 2), 2, WIFI_LOGO_WIDTH, WIFI_LOGO_HEIGHT, WIFI_LOGO_BITS);
+    display->setFont(Roboto_12);
+    display->setTextAlignment(TEXT_ALIGN_CENTER);
+    display->drawStringMaxWidth(SCREEN_HALF_X, 44, SCREEN_WIDTH, "SSID: \"" + String(ssid) + "\"");
+    display->display();
+}
+
+
 void setup() {
   Serial.begin(115200);
 
@@ -63,15 +73,8 @@ void setup() {
   
   // Configure wifi connection
   WiFiManager wifiManager;
-  // Display setup infos on screen (wifi logo + SSID)
-  String ssid = "Clock";
-  display.drawXbm((int)(SCREEN_HALF_X - WIFI_LOGO_WIDTH / 2), 2, WIFI_LOGO_WIDTH, WIFI_LOGO_HEIGHT, WIFI_LOGO_BITS);
-  display.setFont(Roboto_12);
-  display.setTextAlignment(TEXT_ALIGN_CENTER);
-  display.drawStringMaxWidth(SCREEN_HALF_X, 44, SCREEN_WIDTH, "SSID: \"" + ssid + "\"");
-  display.display();
-  
-  wifiManager.autoConnect(ssid.c_str());
+  showWifiSetup(&display, SSID);
+  wifiManager.autoConnect(SSID);
 
   // Clear screen
   display.clear();
