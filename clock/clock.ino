@@ -8,7 +8,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-#include <SSD1306Wire.h>
+#include <SSD1306Brzo.h>
 #include <TimeLib.h>
 
 #include "config.hpp"
@@ -16,7 +16,7 @@
 #include "images.hpp"
 
 // Display
-SSD1306Wire display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
+SSD1306Brzo display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
 // NTP
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, TIME_NTP_SERVER, TIME_OFFSET, TIME_SYNC_DELAY);

@@ -6,3 +6,4 @@
 - [NTPClient](https://github.com/arduino-libraries/NTPClient/)
 - [Time](https://github.com/PaulStoffregen/Time)
 - [WifiManager](https://github.com/tzapu/WiFiManager)
+- [brzo-i2c](https://github.com/pasko-zh/brzo_i2c)
