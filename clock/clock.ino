@@ -67,17 +67,24 @@ void showWifiSetup(OLEDDisplay *display, const char* ssid) {
 void drawClockFrame(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y) {
   display->setFont(Roboto_36);
   display->setTextAlignment(TEXT_ALIGN_CENTER);
-  display->drawStringMaxWidth(SCREEN_HALF_X, 0, SCREEN_WIDTH, getTime());
+  display->drawStringMaxWidth(x + SCREEN_HALF_X, y, SCREEN_WIDTH, getTime());
   display->setFont(Roboto_12);
-  display->drawStringMaxWidth(SCREEN_HALF_X, 39, SCREEN_WIDTH, getDate());
+  display->drawStringMaxWidth(x + SCREEN_HALF_X, y + 39, SCREEN_WIDTH, getDate());
+}
+
+
+void drawWeatherFrame(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y) {
+  display->setFont(Roboto_16);
+  display->setTextAlignment(TEXT_ALIGN_CENTER);
+  display->drawStringMaxWidth(x + SCREEN_HALF_X, y, SCREEN_WIDTH, "Here comes the sun...");
 }
 
 
 // Display
 SSD1306Brzo display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
 OLEDDisplayUi ui(&display);
-FrameCallback frames[] = { drawClockFrame };
-int framesCount = 1;
+FrameCallback frames[] = { drawClockFrame, drawWeatherFrame };
+int framesCount = 2;
 
 // NTP
 WiFiUDP ntpUDP;
@@ -104,8 +111,6 @@ void setup() {
   ui.setTargetFPS(30);
   ui.setActiveSymbol(UI_ACTIVE_SYMBOL);
   ui.setInactiveSymbol(UI_INACTIVE_SYMBOL);
-  ui.setIndicatorPosition(BOTTOM);
-  ui.setIndicatorDirection(LEFT_RIGHT);
   ui.setFrameAnimation(SLIDE_LEFT);
   ui.setFrames(frames, framesCount);
   ui.init();
@@ -117,9 +122,11 @@ void setup() {
 
 
 void loop() {
-  // Update time if needed
-  timeClient.update();
-  setTime(timeClient.getEpochTime());
+  // Don't break a running animation
+  if (ui.getUiState()->frameState == FIXED) {
+    timeClient.update();
+    setTime(timeClient.getEpochTime());
+  }
 
   int remainingTimeBudget = ui.update();
   if (remainingTimeBudget > 0) {
