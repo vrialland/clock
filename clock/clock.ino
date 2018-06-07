@@ -1,57 +1,19 @@
 // WifiManager
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266WiFi.h>
 #include <WiFiManager.h>
-
-// NTP Client
-#include <NTPClient.h>
-#include <WiFiUdp.h>
 
 // SSD1306 + UI
 #include <SSD1306Brzo.h>
 #include <OLEDDisplayUi.h>
 
-// Clock helpers
-#include <TimeLib.h>
-
+// Local imports
 #include "config.hpp"
 #include "fonts.hpp"
 #include "images.hpp"
 
-
-// Clock helpers
-String getTime() {
-  int hours = hour();
-  int minutes = minute();
-  String out = "";
-  out += hours < 10 ? "0" + String(hours) : String(hours);
-  out += ":";
-  out += minutes < 10 ? "0" + String(minutes) : String(minutes);
-  return out;
-}
-
-
-String getDate() {
-  const String months[] = {
-    "janvier",
-    "février",
-    "mars",
-    "avril",
-    "mai",
-    "juin",
-    "juillet",
-    "août",
-    "septembre",
-    "octobre",
-    "novembre",
-    "décembre"
-  };
-  String dayStr = String(day());
-  String monthStr = months[month() - 1];
-  String yearStr = String(year());
-  return dayStr + " " + monthStr + " " + yearStr;
-}
+// Apps
+#include "app_clock.hpp"
 
 
 void showWifiSetup(OLEDDisplay *display, const char* ssid) {
@@ -63,13 +25,12 @@ void showWifiSetup(OLEDDisplay *display, const char* ssid) {
 }
 
 
+// Apps
+ClockApp appClock;
+
 // Apps frames
 void drawClockFrame(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y) {
-  display->setFont(Roboto_36);
-  display->setTextAlignment(TEXT_ALIGN_CENTER);
-  display->drawStringMaxWidth(x + SCREEN_HALF_X, y, SCREEN_WIDTH, getTime());
-  display->setFont(Roboto_12);
-  display->drawStringMaxWidth(x + SCREEN_HALF_X, y + 39, SCREEN_WIDTH, getDate());
+  appClock.draw(display, state, x, y);
 }
 
 
@@ -80,15 +41,15 @@ void drawWeatherFrame(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x
 }
 
 
+// NTPClient
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, TIME_NTP_SERVER, TIME_OFFSET, TIME_SYNC_DELAY);
+
 // Display
 SSD1306Brzo display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
 OLEDDisplayUi ui(&display);
 FrameCallback frames[] = { drawClockFrame, drawWeatherFrame };
 int framesCount = 2;
-
-// NTP
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, TIME_NTP_SERVER, TIME_OFFSET, TIME_SYNC_DELAY);
 
 
 void setup() {
@@ -115,18 +76,24 @@ void setup() {
   ui.setFrames(frames, framesCount);
   ui.init();
   display.flipScreenVertically();
-  
-  // Init NTP client
+
+  // TODO: add loading...
+  // Init NTP
   timeClient.begin();
 }
 
 
 void loop() {
-  // Don't break a running animation
-  if (ui.getUiState()->frameState == FIXED) {
-    timeClient.update();
-    setTime(timeClient.getEpochTime());
-  }
+  Serial.println("loop");
+  Serial.println(millis());
+
+    // Don't break a running animation
+    if (ui.getUiState()->frameState == FIXED) {
+      if (timeClient.update()) {
+        Serial.println("Update time");
+        setTime(timeClient.getEpochTime());
+      }
+    }
 
   int remainingTimeBudget = ui.update();
   if (remainingTimeBudget > 0) {
