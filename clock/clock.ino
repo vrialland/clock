@@ -26,7 +26,7 @@ void showWifiSetup(OLEDDisplay *display, const char* ssid) {
 
 
 // Apps
-ClockApp appClock;
+ClockApp appClock(TIME_NTP_SERVER, TIME_OFFSET, TIME_USE_DAYLIGHT, TIME_MINUTES, TIME_SYNC_DELAY);
 
 // Apps frames
 void drawClockFrame(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x, int16_t y) {
@@ -40,10 +40,6 @@ void drawWeatherFrame(OLEDDisplay *display, OLEDDisplayUiState *state, int16_t x
   display->drawStringMaxWidth(x + SCREEN_HALF_X, y, SCREEN_WIDTH, "Here comes the sun...");
 }
 
-
-// NTPClient
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, TIME_NTP_SERVER, TIME_OFFSET, TIME_SYNC_DELAY);
 
 // Display
 SSD1306Brzo display(SCREEN_ADDRESS, SCREEN_SDA, SCREEN_SCL);
@@ -77,23 +73,22 @@ void setup() {
   ui.init();
   display.flipScreenVertically();
 
-  // TODO: add loading...
-  // Init NTP
-  timeClient.begin();
+  display.clear();
+  display.display();
+
+  // TODO: loading
+  appClock.begin();
 }
 
 
 void loop() {
-  Serial.println("loop");
-  Serial.println(millis());
-
-    // Don't break a running animation
-    if (ui.getUiState()->frameState == FIXED) {
-      if (timeClient.update()) {
-        Serial.println("Update time");
-        setTime(timeClient.getEpochTime());
-      }
-    }
+  unsigned long ms = millis();
+  Serial.println("Loop " + String(ms));
+  
+  // Don't break a running animation
+  if (ui.getUiState()->frameState == FIXED) {
+    appClock.update(ms);
+  }
 
   int remainingTimeBudget = ui.update();
   if (remainingTimeBudget > 0) {

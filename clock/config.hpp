@@ -15,7 +15,9 @@
 
 // NTP setting
 #define TIME_NTP_SERVER "pool.ntp.org" // NTP server URL
-#define TIME_OFFSET 2 * 3600  // Offset to UTC time in seconds 
+#define TIME_OFFSET 1  // Offset to UTC time in hours
 #define TIME_SYNC_DELAY 3600 // Delay before NTP resync
+#define TIME_USE_DAYLIGHT true // Daylight savings
+#define TIME_MINUTES 0 // Minutes offset
 
 #endif

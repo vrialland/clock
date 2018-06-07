@@ -1,6 +1,25 @@
 #include "app_clock.hpp"
 
 
+ClockApp::ClockApp(String ntpServerName, int8_t timeOffset, bool daylight, int8_t minutes, int updateInterval):
+  BaseApp(updateInterval), _ntpServerName(ntpServerName), _timeOffset(timeOffset), _daylight(daylight), _minutes(minutes) {}
+
+
+void ClockApp::begin() {
+  NTP.begin(this->_ntpServerName, this->_timeOffset, this->_daylight, this->_minutes);
+  NTP.setInterval(this->_updateInterval);
+}
+
+
+bool ClockApp::needsUpdate(unsigned long ms) {
+  // Handled by ntp client
+  return false;
+}
+
+
+bool ClockApp::doUpdate() {}
+
+
 String ClockApp::getDate() const {
   const String months[] = {
     "janvier",
