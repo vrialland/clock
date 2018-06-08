@@ -73,11 +73,25 @@ void setup() {
   ui.init();
   display.flipScreenVertically();
 
+  // Setup loading
+  int x0=4, y0=32, x1=120, y1=8, textY = 44;
+  display.setFont(Roboto_12);
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+  
+  // Load apps
   display.clear();
+  display.drawProgressBar(x0, y0, x1, y1, 0);
+  display.drawStringMaxWidth(SCREEN_HALF_X, textY, SCREEN_WIDTH, "Loading clock app...");
+  display.display();
+  appClock.begin();
+
+  // Loading finished!
+  display.clear();
+  display.drawProgressBar(x0, y0, x1, y1, 100);
+  display.drawStringMaxWidth(SCREEN_HALF_X, textY, SCREEN_WIDTH, "Done !");
   display.display();
 
-  // TODO: loading
-  appClock.begin();
+  delay(1000);
 }
 
 
